@@ -24,6 +24,8 @@ services:
       db:
         condition: service_healthy
     restart: always
+    env_file:
+      - .env
     volumes:
       - .:/bot
     environment:

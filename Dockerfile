@@ -1,22 +1,30 @@
 FROM python:3.13-slim
+
+ENV LANG=ja_JP.UTF-8 \
+    LANGUAGE=ja_JP:ja \
+    LC_ALL=ja_JP.UTF-8 \
+    TZ=Asia/Tokyo \
+    TERM=xterm \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 WORKDIR /bot
 
-# 更新・日本語化
-RUN apt-get update && apt-get -y install locales && apt-get -y upgrade && \
-	localedef -f UTF-8 -i ja_JP ja_JP.UTF-8
-ENV LANG ja_JP.UTF-8
-ENV LANGUAGE ja_JP:ja
-ENV LC_ALL ja_JP.UTF-8
-ENV TZ Asia/Tokyo
-ENV TERM xterm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    locales \
+    && localedef -f UTF-8 -i ja_JP ja_JP.UTF-8 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# pip install
-COPY requirements.txt /bot/
-RUN pip install -r requirements.txt
-COPY . /bot
+COPY requirements.txt .
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r requirements.txt
 
-# ポート開放 (uvicornで指定したポート)
+COPY . .
+
+RUN useradd -m botuser && chown -R botuser:botuser /bot
+USER botuser
+
 EXPOSE 8080
 
-# 実行
 ENTRYPOINT ["python", "main.py"]

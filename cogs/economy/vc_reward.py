@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
-import math
+import math, os
 from core.db_base import EconomyBase
 
 class VCReward(commands.Cog, EconomyBase):
@@ -17,13 +17,15 @@ class VCReward(commands.Cog, EconomyBase):
         self.base_reward = 50      # 通常時の報酬
         
         # --- 特典設定 ---
-        self.special_role_id = 123456789012345678 # 特典を与えるロールID
+        self.special_role_id = int(os.getenv("SPECIAL_ROLE_ID", "0")) # 特典を与えるロールID
         self.multiplier = 1.5                     # 倍率 (1.5倍)
         
         # --- 除外チャンネル設定 ---
-        self.excluded_channel_ids = [
-            111222333444555666, # 除外したいVCのID
-        ]
+        env_excluded = os.getenv("EXCLUDED_CHANNEL_IDS")
+        if env_excluded:
+            self.excluded_channel_ids = [int(i.strip()) for i in env_excluded.split(",")]
+        else:
+            self.excluded_channel_ids = []
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):

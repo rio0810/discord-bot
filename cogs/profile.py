@@ -5,11 +5,11 @@ import os
 class VoiceProfile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        env_channels = os.getenv("TARGET_CHANNEL_IDS", "")
+        env_channels = os.getenv("PROFILE_TARGET_CHANNEL_IDS", "")
         if env_channels:
-            self.target_channel_ids = [int(id_str.strip()) for id_str in env_channels.split(",")]
+            self.profile_target_channel_ids = [int(id_str.strip()) for id_str in env_channels.split(",")]
         else:
-            self.target_channel_ids = []
+            self.profile_target_channel_ids = []
             
         self.sent_messages = {}
 
@@ -35,7 +35,7 @@ class VoiceProfile(commands.Cog):
             latest_message = None
 
             # プロフィール投稿用チャンネルから最新の投稿を探す
-            for channel_id in self.target_channel_ids:
+            for channel_id in self.profile_target_channel_ids:
                 channel = self.bot.get_channel(channel_id)
                 if channel:
                     async for msg in channel.history(limit=100):

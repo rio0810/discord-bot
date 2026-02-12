@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
 from datetime import datetime
+import os
 from .db_base import EconomyBase
 
 class AdminCogBase(commands.Cog, EconomyBase):
-    ADMIN_ROLE_ID = 1409402749161832518
-    LOG_CHANNEL_ID = 1469597296181117021
+    ADMIN_ROLE_ID = int(os.getenv("ADMIN_ROLE_ID"))
+    LOG_CHANNEL_ID = int(os.getenv("LOG_CHANNEL_ID"))
 
     def __init__(self, bot):
         super().__init__()
